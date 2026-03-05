@@ -17,6 +17,7 @@ type ApplicationConfig struct {
 	SystemState                         *system.SystemState
 	ExternalBackends                    []string
 	UploadLimitMB, Threads, ContextSize int
+	DefaultGPULayers                    string // GPU layer mode: "max" (default), "auto", or a number
 	F16                                 bool
 	Debug                               bool
 	EnableTracing                       bool
@@ -416,6 +417,12 @@ func WithContextSize(ctxSize int) AppOption {
 	}
 }
 
+func WithDefaultGPULayers(mode string) AppOption {
+	return func(o *ApplicationConfig) {
+		o.DefaultGPULayers = mode
+	}
+}
+
 func WithTunnelCallback(callback func(tunnels []string)) AppOption {
 	return func(o *ApplicationConfig) {
 		o.TunnelCallback = callback
@@ -548,6 +555,7 @@ func (o *ApplicationConfig) ToConfigLoaderOptions() []ConfigLoaderOption {
 		LoadOptionDebug(o.Debug),
 		LoadOptionF16(o.F16),
 		LoadOptionThreads(o.Threads),
+		LoadOptionDefaultGPULayers(o.DefaultGPULayers),
 		ModelPath(o.SystemState.Model.ModelsPath),
 	}
 }
@@ -585,6 +593,10 @@ func (o *ApplicationConfig) ToRuntimeSettings() RuntimeSettings {
 	autoloadBackendGalleries := o.AutoloadBackendGalleries
 	apiKeys := o.ApiKeys
 	agentJobRetentionDays := o.AgentJobRetentionDays
+	defaultGPULayers := o.DefaultGPULayers
+	if defaultGPULayers == "" {
+		defaultGPULayers = "max"
+	}
 
 	// Format timeouts as strings
 	var idleTimeout, busyTimeout, watchdogInterval string
@@ -650,6 +662,7 @@ func (o *ApplicationConfig) ToRuntimeSettings() RuntimeSettings {
 		ApiKeys:                  &apiKeys,
 		AgentJobRetentionDays:    &agentJobRetentionDays,
 		OpenResponsesStoreTTL:    &openResponsesStoreTTL,
+		DefaultGPULayers:         &defaultGPULayers,
 	}
 }
 
@@ -799,6 +812,10 @@ func (o *ApplicationConfig) ApplyRuntimeSettings(settings *RuntimeSettings) (req
 		}
 		// This setting doesn't require restart, can be updated dynamically
 	}
+	if settings.DefaultGPULayers != nil {
+		o.DefaultGPULayers = *settings.DefaultGPULayers
+	}
+
 	// Note: ApiKeys requires special handling (merging with startup keys) - handled in caller
 
 	return requireRestart
