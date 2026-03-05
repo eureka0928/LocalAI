@@ -36,6 +36,7 @@ type LoadOptions struct {
 	debug            bool
 	threads, ctxSize int
 	f16              bool
+	defaultGPULayers string
 }
 
 func LoadOptionDebug(debug bool) ConfigLoaderOption {
@@ -65,6 +66,12 @@ func ModelPath(modelPath string) ConfigLoaderOption {
 func LoadOptionF16(f16 bool) ConfigLoaderOption {
 	return func(o *LoadOptions) {
 		o.f16 = f16
+	}
+}
+
+func LoadOptionDefaultGPULayers(mode string) ConfigLoaderOption {
+	return func(o *LoadOptions) {
+		o.defaultGPULayers = mode
 	}
 }
 
@@ -151,6 +158,7 @@ func (bcl *ModelConfigLoader) LoadModelConfigFileByNameDefaultOptions(modelName 
 		LoadOptionThreads(appConfig.Threads),
 		LoadOptionContextSize(appConfig.ContextSize),
 		LoadOptionF16(appConfig.F16),
+		LoadOptionDefaultGPULayers(appConfig.DefaultGPULayers),
 		ModelPath(appConfig.SystemState.Model.ModelsPath))
 }
 
