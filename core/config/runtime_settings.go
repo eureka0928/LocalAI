@@ -31,6 +31,9 @@ type RuntimeSettings struct {
 	LRUEvictionMaxRetries      *int    `json:"lru_eviction_max_retries,omitempty"`      // Maximum number of retries when waiting for busy models to become idle (default: 30)
 	LRUEvictionRetryInterval   *string `json:"lru_eviction_retry_interval,omitempty"`   // Interval between retries when waiting for busy models (e.g., 1s, 2s) (default: 1s)
 
+	// GPU layer offloading
+	DefaultGPULayers *string `json:"default_gpu_layers,omitempty"` // GPU layer mode: "max" (offload all), "auto" (let backend decide), or a number
+
 	// Performance settings
 	Threads         *int  `json:"threads,omitempty"`
 	ContextSize     *int  `json:"context_size,omitempty"`
