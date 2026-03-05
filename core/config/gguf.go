@@ -15,7 +15,6 @@ import (
 
 const (
 	defaultContextSize = 1024
-	defaultNGPULayers  = 99999999
 )
 
 func guessGGUFFromFile(cfg *ModelConfig, f *gguf.GGUFFile, defaultCtx int) {
@@ -38,13 +37,10 @@ func guessGGUFFromFile(cfg *ModelConfig, f *gguf.GGUFFile, defaultCtx int) {
 		}
 	}
 
-	if cfg.NGPULayers == nil {
-		// we assume we want to offload all layers
-		defaultHigh := defaultNGPULayers
-		cfg.NGPULayers = &defaultHigh
-	}
+	// NGPULayers is no longer set here — it is handled centrally in
+	// SetDefaults() using the global DefaultGPULayers mode.
 
-	xlog.Debug("[gguf] guessDefaultsFromFile: NGPULayers set", "NGPULayers", cfg.NGPULayers, "modelName", f.Metadata().Name)
+	xlog.Debug("[gguf] guessDefaultsFromFile: NGPULayers", "NGPULayers", cfg.NGPULayers, "modelName", f.Metadata().Name)
 
 	// identify from well known templates first, otherwise use the raw jinja template
 	chatTemplate, found := f.Header.MetadataKV.Get("tokenizer.chat_template")
