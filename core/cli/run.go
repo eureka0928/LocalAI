@@ -39,9 +39,10 @@ type RunCMD struct {
 	Models                   []string `env:"LOCALAI_MODELS,MODELS" help:"A List of model configuration URLs to load" group:"models"`
 	PreloadModelsConfig      string   `env:"LOCALAI_PRELOAD_MODELS_CONFIG,PRELOAD_MODELS_CONFIG" help:"A List of models to apply at startup. Path to a YAML config file" group:"models"`
 
-	F16         bool `name:"f16" env:"LOCALAI_F16,F16" help:"Enable GPU acceleration" group:"performance"`
-	Threads     int  `env:"LOCALAI_THREADS,THREADS" short:"t" help:"Number of threads used for parallel computation. Usage of the number of physical cores in the system is suggested" group:"performance"`
-	ContextSize int  `env:"LOCALAI_CONTEXT_SIZE,CONTEXT_SIZE" help:"Default context size for models" group:"performance"`
+	F16              bool   `name:"f16" env:"LOCALAI_F16,F16" help:"Enable GPU acceleration" group:"performance"`
+	DefaultGPULayers string `env:"LOCALAI_DEFAULT_GPU_LAYERS,DEFAULT_GPU_LAYERS" default:"max" help:"Default GPU layer mode for models without explicit gpu_layers: 'max' (offload all, default), 'auto' (let backend decide), or a number" group:"performance"`
+	Threads          int    `env:"LOCALAI_THREADS,THREADS" short:"t" help:"Number of threads used for parallel computation. Usage of the number of physical cores in the system is suggested" group:"performance"`
+	ContextSize      int    `env:"LOCALAI_CONTEXT_SIZE,CONTEXT_SIZE" help:"Default context size for models" group:"performance"`
 
 	Address                            string   `env:"LOCALAI_ADDRESS,ADDRESS" default:":8080" help:"Bind address for the API server" group:"api"`
 	CORS                               bool     `env:"LOCALAI_CORS,CORS" help:"" group:"api"`
@@ -119,6 +120,7 @@ func (r *RunCMD) Run(ctx *cliContext.Context) error {
 		config.WithUploadDir(r.UploadPath),
 		config.WithDynamicConfigDir(r.LocalaiConfigDir),
 		config.WithDynamicConfigDirPollInterval(r.LocalaiConfigDirPollInterval),
+		config.WithDefaultGPULayers(r.DefaultGPULayers),
 		config.WithF16(r.F16),
 		config.WithStringGalleries(r.Galleries),
 		config.WithBackendGalleries(r.BackendGalleries),
