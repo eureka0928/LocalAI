@@ -2,6 +2,7 @@
 import asyncio
 from concurrent import futures
 import argparse
+import json
 import signal
 import sys
 import os
@@ -21,7 +22,7 @@ from grpc_auth import get_auth_interceptors
 
 from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.engine.async_llm_engine import AsyncLLMEngine
-from vllm.sampling_params import SamplingParams
+from vllm.sampling_params import SamplingParams, GuidedDecodingParams
 from vllm.utils import random_uuid
 from vllm.transformers_utils.tokenizer import get_tokenizer
 from vllm.multimodal.utils import fetch_image
