@@ -282,8 +282,6 @@ func gRPCPredictOpts(c config.ModelConfig, modelPath string) *pb.PredictOptions 
 		TensorSplit:         c.TensorSplit,
 		TailFreeSamplingZ:   float32(*c.TFZ),
 		TypicalP:            float32(*c.TypicalP),
-		JSONSchema:          c.JSONSchema,
-		ResponseFormat:      c.ResponseFormat,
 	}
 
 	metadata := map[string]string{}
@@ -293,6 +291,12 @@ func gRPCPredictOpts(c config.ModelConfig, modelPath string) *pb.PredictOptions 
 		} else {
 			metadata["enable_thinking"] = "true"
 		}
+	}
+	if c.ResponseFormat != "" {
+		metadata["response_format"] = c.ResponseFormat
+	}
+	for k, v := range c.RequestMetadata {
+		metadata[k] = v
 	}
 	pbOpts.Metadata = metadata
 
